@@ -1,0 +1,5 @@
+entity-packages: br.com.astrosoft.inventario.model,br.com.astrosoft.framework.model
+transactional-packages: br.com.astrosoft
+querybean-packages: br.com.astrosoft.inventario.model
+profile-location: true
+

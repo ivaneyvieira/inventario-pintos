@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="cl" pkName="pk_cl">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="clno" type="integer" notnull="true"/>
+            <column name="departamento" type="varchar" notnull="true"/>
+            <column name="grupo" type="varchar" notnull="true"/>
+            <column name="secao" type="varchar" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_cl_clno" columnNames="clno" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="coleta" pkName="pk_coleta">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="num_coleta" type="integer" notnull="true"/>
+            <column name="coletor" type="integer" notnull="true"/>
+            <column name="status" type="integer" notnull="true" checkConstraint="check ( status in (0,1))" checkConstraintName="ck_coleta_status"/>
+            <column name="loteinv_id" type="bigint" notnull="true" references="lote_inv.id" foreignKeyName="fk_coleta_loteinv_id" foreignKeyIndex="ix_coleta_loteinv_id"/>
+            <column name="usuario_id" type="bigint" notnull="true" references="usuario.id" foreignKeyName="fk_coleta_usuario_id" foreignKeyIndex="ix_coleta_usuario_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="estoque" pkName="pk_estoque">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="utmdata" type="date" notnull="true"/>
+            <column name="filtro" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="inv" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="qt_saldo" type="integer" notnull="true"/>
+            <column name="qt_inv" type="integer" notnull="true"/>
+            <column name="transferencia" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="produto_id" type="bigint" notnull="true" references="produto.id" foreignKeyName="fk_estoque_produto_id" foreignKeyIndex="ix_estoque_produto_id"/>
+            <column name="inventario_id" type="bigint" notnull="true" references="inventario.id" foreignKeyName="fk_estoque_inventario_id" foreignKeyIndex="ix_estoque_inventario_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="fornecedor" pkName="pk_fornecedor">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="codigo" type="integer" notnull="true"/>
+            <column name="fantazia" type="varchar" notnull="true"/>
+            <column name="razao" type="varchar" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_fornecedor_codigo" columnNames="codigo" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="grupo_inventario" pkName="pk_grupo_inventario">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="nome" type="varchar" notnull="true"/>
+            <column name="descricao" type="varchar" notnull="true"/>
+            <column name="data_inicio" type="date" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="inventario" pkName="pk_inventario">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="numero" type="integer" notnull="true"/>
+            <column name="data" type="date" notnull="true"/>
+            <column name="observacao" type="clob" notnull="true"/>
+            <column name="tipo_inventario" type="integer" notnull="true" checkConstraint="check ( tipo_inventario in (0,1))" checkConstraintName="ck_inventario_tipo_inventario"/>
+            <column name="status_inventario" type="integer" notnull="true" checkConstraint="check ( status_inventario in (0,1))" checkConstraintName="ck_inventario_status_inventario"/>
+            <column name="loja_id" type="bigint" notnull="true" references="loja.id" foreignKeyName="fk_inventario_loja_id" foreignKeyIndex="ix_inventario_loja_id"/>
+            <column name="grupo_inventario_id" type="bigint" notnull="true" references="grupo_inventario.id" foreignKeyName="fk_inventario_grupo_inventario_id" foreignKeyIndex="ix_inventario_grupo_inventario_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_inventario_numero" columnNames="numero" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="inventario_cl" pkName="pk_inventario_cl">
+            <column name="inventario_id" type="bigint" notnull="true" primaryKey="true"/>
+            <column name="cl_id" type="bigint" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_inventario_cl_inventario" columnNames="inventario_id" refColumnNames="id" refTableName="inventario" indexName="ix_inventario_cl_inventario"/>
+            <foreignKey name="fk_inventario_cl_cl" columnNames="cl_id" refColumnNames="id" refTableName="cl" indexName="ix_inventario_cl_cl"/>
+        </createTable>
+        <createTable name="inventario_fornecedor" pkName="pk_inventario_fornecedor">
+            <column name="inventario_id" type="bigint" notnull="true" primaryKey="true"/>
+            <column name="fornecedor_id" type="bigint" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_inventario_fornecedor_inventario" columnNames="inventario_id" refColumnNames="id" refTableName="inventario" indexName="ix_inventario_fornecedor_inventario"/>
+            <foreignKey name="fk_inventario_fornecedor_fornecedor" columnNames="fornecedor_id" refColumnNames="id" refTableName="fornecedor" indexName="ix_inventario_fornecedor_fornecedor"/>
+        </createTable>
+        <createTable name="leitura" pkName="pk_leitura">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="data" type="date" notnull="true"/>
+            <column name="hora" type="time" notnull="true"/>
+            <column name="leitura" type="varchar" notnull="true"/>
+            <column name="observacao" type="varchar" notnull="true"/>
+            <column name="quant" type="integer" notnull="true"/>
+            <column name="status" type="integer" notnull="true" checkConstraint="check ( status in (0,1))" checkConstraintName="ck_leitura_status"/>
+            <column name="coleta_id" type="bigint" notnull="true" references="coleta.id" foreignKeyName="fk_leitura_coleta_id" foreignKeyIndex="ix_leitura_coleta_id"/>
+            <column name="produto_id" type="bigint" notnull="true" references="produto.id" foreignKeyName="fk_leitura_produto_id" foreignKeyIndex="ix_leitura_produto_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="loja" pkName="pk_loja">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="storeno" type="integer" notnull="true"/>
+            <column name="endereco" type="varchar" notnull="true"/>
+            <column name="nome" type="varchar" notnull="true"/>
+            <column name="sigla" type="varchar" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_loja_storeno" columnNames="storeno" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="lote" pkName="pk_lote">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="numero" type="integer" notnull="true"/>
+            <column name="descricao" type="varchar" notnull="true"/>
+            <column name="loja_id" type="bigint" notnull="true" references="loja.id" foreignKeyName="fk_lote_loja_id" foreignKeyIndex="ix_lote_loja_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="lote_inv" pkName="pk_lote_inv">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="descricao" type="varchar" notnull="true"/>
+            <column name="tipo_lote" type="integer" notnull="true" checkConstraint="check ( tipo_lote in (0,1))" checkConstraintName="ck_lote_inv_tipo_lote"/>
+            <column name="inventario_id" type="bigint" notnull="true" references="inventario.id" foreignKeyName="fk_lote_inv_inventario_id" foreignKeyIndex="ix_lote_inv_inventario_id"/>
+            <column name="lote_id" type="bigint" notnull="true" references="lote.id" foreignKeyName="fk_lote_inv_lote_id" foreignKeyIndex="ix_lote_inv_lote_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="produto" pkName="pk_produto">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="barcode" type="varchar" notnull="true"/>
+            <column name="codigo" type="varchar" notnull="true"/>
+            <column name="grade" type="varchar" notnull="true"/>
+            <column name="fora_linha" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="uso_consumo" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="custo" type="double" notnull="true"/>
+            <column name="fornecedor_id" type="bigint" notnull="true" references="fornecedor.id" foreignKeyName="fk_produto_fornecedor_id" foreignKeyIndex="ix_produto_fornecedor_id"/>
+            <column name="cl_id" type="bigint" notnull="true" references="cl.id" foreignKeyName="fk_produto_cl_id" foreignKeyIndex="ix_produto_cl_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_produto_barcode" columnNames="barcode" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="transferencia" pkName="pk_transferencia">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="quant" type="integer" notnull="true"/>
+            <column name="loja_o_id" type="bigint" notnull="true" references="loja.id" foreignKeyName="fk_transferencia_loja_o_id" foreignKeyIndex="ix_transferencia_loja_o_id"/>
+            <column name="loja_d_id" type="bigint" notnull="true" references="loja.id" foreignKeyName="fk_transferencia_loja_d_id" foreignKeyIndex="ix_transferencia_loja_d_id"/>
+            <column name="prd_o_id" type="bigint" notnull="true" references="produto.id" foreignKeyName="fk_transferencia_prd_o_id" foreignKeyIndex="ix_transferencia_prd_o_id"/>
+            <column name="prd_d_id" type="bigint" notnull="true" references="produto.id" foreignKeyName="fk_transferencia_prd_d_id" foreignKeyIndex="ix_transferencia_prd_d_id"/>
+            <column name="grupo_id" type="bigint" notnull="true" references="grupo_inventario.id" foreignKeyName="fk_transferencia_grupo_id" foreignKeyIndex="ix_transferencia_grupo_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="usuario" pkName="pk_usuario">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="matricula" type="integer" notnull="true"/>
+            <column name="nome" type="varchar" notnull="true"/>
+            <column name="senha" type="varchar" notnull="true"/>
+            <column name="apelido" type="varchar" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="when_created" type="timestamp" notnull="true"/>
+            <column name="when_modified" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_usuario_matricula" columnNames="matricula" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createIndex indexName="ix_estoque_inventario_id_produto_id" tableName="estoque" columns="inventario_id,produto_id"/>
+        <createIndex indexName="ix_grupo_inventario_nome" tableName="grupo_inventario" columns="nome"/>
+        <createIndex indexName="ix_inventario_loja_id_data" tableName="inventario" columns="loja_id,data"/>
+        <createIndex indexName="ix_inventario_data" tableName="inventario" columns="data"/>
+        <createIndex indexName="ix_lote_loja_id_numero" tableName="lote" columns="loja_id,numero"/>
+        <createIndex indexName="ix_lote_inv_inventario_id_lote_id" tableName="lote_inv" columns="inventario_id,lote_id"/>
+        <createIndex indexName="ix_produto_codigo_grade" tableName="produto" columns="codigo,grade"/>
+    </changeSet>
+</migration>
